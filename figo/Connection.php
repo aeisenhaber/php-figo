@@ -66,8 +66,8 @@ class Connection {
         }
 
         $headers = array("Authorization"  => "Basic ".base64_encode($this->client_id.":".$this->client_secret),
-                        "Content-Type"   => $content_type,
-                         "Content-Length" => strlen($data));
+            "Content-Type"   => $content_type,
+            "Content-Length" => strlen($data));
 
         $request = new HttpsRequest();
         return $request->request($path, $data, $method, $headers);
@@ -88,8 +88,8 @@ class Connection {
      */
     public function login_url($state, $scope = null) {
         $data = array("response_type" => "code",
-                      "client_id"     => $this->client_id,
-                      "state"         => $state);
+            "client_id"     => $this->client_id,
+            "state"         => $state);
         if (!is_null($this->redirect_uri)) {
             $data["redirect_uri"] = $this->redirect_uri;
         }
@@ -167,28 +167,28 @@ class Connection {
      * Create a Process
      * Example Usage:
      *   $process = new \figo\Process();
-         $process->email = 'my_email@example.com';
-         $process->password = 'my_password';
-         $process->state = 'First_step';
-         $process->steps =   array(
-            array(
-                'options' => json_decode('{}'),
-                'type' => 'figo.steps.account.create',
-            ),
-            array(
-                'options' => array(
-                'account_number' => '100100100',
-                'amount' =>  99,
-                'bank_code' => "82051000",
-                'currency' => "EUR",
-                'name' => "Figo GmbH",
-                'purpose' => "Yearly contribution",
-                'type' => "Transfer",
-            ),
-            'type' => 'figo.steps.payment.submit',
-            )
-      );
-        $return = $connection->create_process($process);
+    $process->email = 'my_email@example.com';
+    $process->password = 'my_password';
+    $process->state = 'First_step';
+    $process->steps =   array(
+    array(
+    'options' => json_decode('{}'),
+    'type' => 'figo.steps.account.create',
+    ),
+    array(
+    'options' => array(
+    'account_number' => '100100100',
+    'amount' =>  99,
+    'bank_code' => "82051000",
+    'currency' => "EUR",
+    'name' => "Figo GmbH",
+    'purpose' => "Yearly contribution",
+    'type' => "Transfer",
+    ),
+    'type' => 'figo.steps.payment.submit',
+    )
+    );
+    $return = $connection->create_process($process);
      *
      *
      * @param Process $process Figo Process
@@ -214,6 +214,29 @@ class Connection {
         $data = array('name' => $name, 'email' => $email, 'password' => $password, 'language' => $language, 'affiliate_client_id' => $this->client_id);
         $response = $this->query_api("/auth/user", $data);
         return $response["recovery_password"];
+    }
+
+
+    /**
+     * credential login
+     *
+     * @return array
+     */
+    public function credential_login($username, $password, $device_name = null, $device_type = null, $device_udid = null, $scope = null) {
+        $options = [ "grant_type" => "password", "username" => $username, "password" => $password ];
+
+
+        if ($device_name)
+            $options["device_name"] = $device_name;
+        if ($device_type)
+            $options["device_type"] = $device_type;
+        if ($device_udid)
+            $options["device_udid"] = $device_udid;
+        if ($scope)
+            $options["scope"] = $scope;
+
+        $response = $this->query_api("/auth/token", $options, "POST");
+        return $response;
     }
 
 

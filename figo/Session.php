@@ -52,8 +52,8 @@ class Session {
         $data = is_null($data) ? "" : json_encode($data);
 
         $headers = array("Authorization"  => "Bearer ".$this->access_token,
-                         "Content-Type"   => "application/json",
-                         "Content-Length" => strlen($data));
+            "Content-Type"   => "application/json",
+            "Content-Length" => strlen($data));
 
         $request = new HttpsRequest();
         return $request->request($path, $data, $method, $headers);
@@ -164,6 +164,26 @@ class Session {
         $response = $this->query_api("/rest/accounts/".$account_id);
         return (is_null($response) ? null : new Account($this, $response));
     }
+
+    /**
+     * Add an account
+     *
+     * @param MISSING
+     * @return Account account object
+     */
+
+    public function add_account($country, $credentials, $bank_code, $iban, $save_pin) {
+        $data = ["country" => $country, "credentials" => $credentials];
+        if ($iban) {
+            $data["iban"] = $iban;
+        } else if ($bank_code) {
+            $data["bank_code"] = $bank_code;
+        }
+        $data["save_pin"] = (is_bool($save_pin)) ? $save_pin : false;
+        $response = $this->query_api("/rest/accounts", $data, "POST");
+        return (is_null($response) ? null : new Account($this, $response));
+    }
+
 
     /**
      * Modify an account
